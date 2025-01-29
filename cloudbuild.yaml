@@ -1,0 +1,36 @@
+steps:
+# Build Docker images for all services
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/frontend:latest', './frontend']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/frontend:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/products:latest', './products']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/products:latest']
+
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/shopping-cart:latest', './shopping-cart']
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/shopping-cart:latest']
+
+# Configure kubectl to use the specified cluster
+- name: 'gcr.io/cloud-builders/gcloud'
+  args: ['container', 'clusters', 'get-credentials', '${_CLUSTER_NAME}', '--zone', '${_CLUSTER_ZONE}']
+
+# Deploy Kubernetes YAML files
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', './frontend.yaml']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', './product.yaml']
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', '-f', './shopping-cart.yaml']
+
+timeout: 1200s
+
+# Substitutions for cluster configuration
+substitutions:
+  _CLUSTER_NAME: my-first-gcp-cluster
+  _CLUSTER_ZONE: us-central1-c
+
