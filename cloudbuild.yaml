@@ -17,7 +17,13 @@ steps:
 
 # Configure kubectl to use the specified cluster
 - name: 'gcr.io/cloud-builders/gcloud'
-  args: ['container', 'clusters', 'get-credentials', '${_CLUSTER_NAME}', '--zone', '${_CLUSTER_ZONE}']
+  args:
+    - 'container'
+    - 'clusters'
+    - 'get-credentials'
+    - '${_CLUSTER_NAME}'
+    - '--zone'
+    - '${_CLUSTER_ZONE}'
 
 # Deploy Kubernetes YAML files
 - name: 'gcr.io/cloud-builders/kubectl'
@@ -27,7 +33,12 @@ steps:
 - name: 'gcr.io/cloud-builders/kubectl'
   args: ['apply', '-f', './shopping-cart.yaml']
 
+# Set timeout
 timeout: 1200s
+
+# Configure logging behavior
+options:
+  logging: CLOUD_LOGGING_ONLY
 
 # Substitutions for cluster configuration
 substitutions:
