@@ -19,6 +19,8 @@ Microservices project made up of 1 frontend service and 2 backend services: prod
 
     docker run -d -p 3001:3001 ms-products:1.0
     docker run -d -p 3002:3002 ms-shopping-cart:1.0
+    CI/CD pipeline test update
+ 
 
 #### To start with docker-compose (repeat for each micro service)
     export COMPOSE_PROJECT_NAME=micro-service-name (frontend)
