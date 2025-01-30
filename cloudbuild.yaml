@@ -1,47 +1,67 @@
 steps:
-# Build Docker images for all services
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/frontend:latest', './frontend']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/frontend:latest']
+  # Step 1: Clone the repository
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', 'https://github.com/mudassir2222/nodemicroservice.git', '.']
 
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/products:latest', './products']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/products:latest']
+  # Step 2: Build the Docker image for the frontend service
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: './frontend'
+    args:
+      [
+        'build', '-t', 'gcr.io/$PROJECT_ID/frontend:latest', '.'
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/frontend:latest']
 
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/shopping-cart:latest', './shopping-cart']
-- name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/shopping-cart:latest']
+  # Step 3: Build the Docker image for the products service
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: './products'
+    args:
+      [
+        'build', '-t', 'gcr.io/$PROJECT_ID/products:latest', '.'
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/products:latest']
 
-# Configure kubectl to use the specified cluster
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
-    - 'container'
-    - 'clusters'
-    - 'get-credentials'
-    - '${_CLUSTER_NAME}'
-    - '--zone'
-    - '${_CLUSTER_ZONE}'
+  # Step 4: Build the Docker image for the shopping-cart service
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: './shopping-cart'
+    args:
+      [
+        'build', '-t', 'gcr.io/$PROJECT_ID/shopping-cart:latest', '.'
+      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/shopping-cart:latest']
 
-# Deploy Kubernetes YAML files
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', './frontend.yaml']
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', './product.yaml']
-- name: 'gcr.io/cloud-builders/kubectl'
-  args: ['apply', '-f', './shopping-cart.yaml']
+  # Step 5: Set up Kubernetes cluster credentials
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args: ['container', 'clusters', 'get-credentials', 'my-first-gcp-cluster', '--zone', 'us-central1-c']
 
-# Set timeout
+  # Step 6: Deploy the frontend service to Kubernetes
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      [
+        'apply', '-f', './k8s/frontend-deployment.yaml'
+      ]
+
+  # Step 7: Deploy the products service to Kubernetes
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      [
+        'apply', '-f', './k8s/products-deployment.yaml'
+      ]
+
+  # Step 8: Deploy the shopping-cart service to Kubernetes
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      [
+        'apply', '-f', './k8s/shopping-cart-deployment.yaml'
+      ]
+
 timeout: 1200s
 
-# Configure logging behavior
-options:
-  logging: CLOUD_LOGGING_ONLY
-
-# Substitutions for cluster configuration
+# Substitutions (Optional)
 substitutions:
-  _CLUSTER_NAME: my-first-gcp-cluster
-  _CLUSTER_ZONE: us-central1-c
+  _REGION: us-central1
+  _CLUSTER: my-first-gcp-cluster
 
