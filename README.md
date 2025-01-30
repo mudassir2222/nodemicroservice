@@ -29,3 +29,4 @@ Microservices project made up of 1 frontend service and 2 backend services: prod
     export DC_APP_PORT=port (3000)
 
     docker-compose -d up
+Trigger test
