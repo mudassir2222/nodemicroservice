@@ -24,6 +24,9 @@ steps:
     - '${_CLUSTER_NAME}'
     - '--zone'
     - '${_CLUSTER_ZONE}'
+  env:
+    - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER_NAME}'
+    - 'CLOUDSDK_COMPUTE_ZONE=${_CLUSTER_ZONE}'
 
 # Deploy Kubernetes YAML files
 - name: 'gcr.io/cloud-builders/kubectl'
